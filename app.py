@@ -151,6 +151,52 @@ def get_householdFamily():
 
 #TODO: EP3 - List households only
 #TODO: EP3 - List family data only
+#TODO: EP3 Household data only
+@app.route("/household")
+def get_households():
+    householdList = Household.query.all()
+
+    #IF households exist in Household DB, return list of households
+    if len(householdList):
+        return jsonify(
+            {
+                "code": 200,
+                "data": {
+                    "households": [household.json() for household in householdList]
+                }
+            }
+        )
+    #Else return 404 error, no households found
+    return jsonify(
+        {
+            "code": 404,
+            "message": "There are no households"
+        }
+    ), 404
+
+#TODO: EP3 - Family member data only
+@app.route("/familymember")
+def get_familymembers():
+    familyList = FamilyMember.query.all()
+
+    #IF households exist in Household DB, return list of households
+    if len(familyList):
+        return jsonify(
+            {
+                "code": 200,
+                "data": {
+                    "familymembers": [family.json() for family in familyList]
+                }
+            }
+        )
+    #Else return 404 error, no households found
+    return jsonify(
+        {
+            "code": 404,
+            "message": "There are no family members"
+        }
+    ), 404
+
 #TODO: EP4 - Specific Household in the DB
 #TODO: EP5 - Grant Checks - Student Encouragement Bonus
 #TODO: EP 5 - Grant Checks - Multigenerational 
