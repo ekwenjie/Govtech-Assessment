@@ -267,9 +267,154 @@ def studentBonusEligibility():
         "data": eligibleHouseholds
         })
 
-#TODO: EP 5 - Grant Checks - Multigenerational 
+#TODO: EP 5 - Grant Checks - Multigenerational
+@app.route("/multigenerationScheme")
+def multigenerationEligibility():
+    familyList = FamilyMember.query.all()
+    householdsJson = get_households().get_json()
+    eligibleHouseholds = []
+    householdLimit = 150000
+    today = date.today()
+
+    for household in householdsJson['data']['households']: 
+        qualifyingMembers = []
+        householdIncome = 0
+        generationalCheck = False
+        houseIdToCheck = household['id']
+        familyMembersToCheck = [familyMember.json() for familyMember in familyList if familyMember.householdId==houseIdToCheck]
+
+        for member in familyMembersToCheck:
+            qualifyingMembers.append(member['id'])
+            householdIncome += member['annualIncome']
+
+            if (generationalCheck == False):
+                birthDate = member['dateOfBirth']
+                age = today.year - birthDate.year - ((today.month, today.day) < (birthDate.month, birthDate.day))
+                if (age < 18) or (age > 55):
+                    generationalCheck = True
+        
+        if (householdIncome < householdLimit) and generationalCheck:
+            eligibleHouseholds.append({"householdId": houseIdToCheck, "qualifyingMemberId": qualifyingMembers})
+
+    if (eligibleHouseholds == []):
+        return jsonify({
+            "code": 200,
+            "data": "There are no eligible households/qualifying members for this grant scheme"
+        })
+
+    return jsonify({
+        "code": 200,
+        "data": eligibleHouseholds
+        })
+ 
 #TODO: EP 5 - Grant Checks - Elder Bonus
+@app.route("/elderBonus")
+def elderbonusEligibility():
+    familyList = FamilyMember.query.all()
+    householdsJson = get_households().get_json()
+    eligibleHouseholds = []
+    today = date.today()
+
+    for household in householdsJson['data']['households']: 
+        qualifyingMembers = []
+        houseIdToCheck = household['id']
+        elderCheck = False
+        familyMembersToCheck = [familyMember.json() for familyMember in familyList if familyMember.householdId==houseIdToCheck]
+
+        for member in familyMembersToCheck:
+            birthDate = member['dateOfBirth']
+            age = today.year - birthDate.year - ((today.month, today.day) < (birthDate.month, birthDate.day))
+            print(((today.month, today.day) < (birthDate.month, birthDate.day)))
+
+            if (age >= 55):
+                qualifyingMembers.append(member['id'])
+                elderCheck = True
+        
+            if (elderCheck):
+                eligibleHouseholds.append({"householdId": houseIdToCheck, "qualifyingMemberId": qualifyingMembers})
+
+    if eligibleHouseholds == []:
+        return jsonify({
+            "code": 200,
+            "data": "There are no eligible households/qualifying members for this grant scheme"
+        })
+
+    return jsonify({
+        "code": 200,
+        "data": eligibleHouseholds
+    })
+
 #TODO: EP 5 - Grant Checks - Baby Sunshine
+@app.route("/babySunshine")
+def babySunshineEligibility():
+    familyList = FamilyMember.query.all()
+    householdsJson = get_households().get_json()
+    eligibleHouseholds = []
+    today = date.today()
+
+    for household in householdsJson['data']['households']: 
+        qualifyingMembers = []
+        houseIdToCheck = household['id']
+        babyCheck = False
+        familyMembersToCheck = [familyMember.json() for familyMember in familyList if familyMember.householdId==houseIdToCheck]
+
+        for member in familyMembersToCheck:
+            birthDate = member['dateOfBirth']
+            if (birthDate.year == today.year):
+                monthAge = today.month - birthDate.month - ((today.day) < (birthDate.day))
+                print(monthAge)
+
+                if (monthAge < 8):
+                    qualifyingMembers.append(member['id'])
+                    babyCheck = True
+        
+            if (babyCheck):
+                eligibleHouseholds.append({"householdId": houseIdToCheck, "qualifyingMemberId": qualifyingMembers})
+    if eligibleHouseholds == []:
+        return jsonify({
+            "code": 200,
+            "data": "There are no eligible households/qualifying members for this grant scheme"
+        })
+    return jsonify({
+        "code": 200,
+        "data": eligibleHouseholds
+    })
+
 #TODO: EP 5 - Grant Checks - YOLO GST Grant
+@app.route("/yoloGSTgrant")
+def yoloGstEligibility():
+    familyList = FamilyMember.query.all()
+    householdsJson = get_households().get_json()
+    eligibleHouseholds = []
+    householdLimit = 100000
+
+    for household in householdsJson['data']['households']: 
+        householdIncome = 0
+        qualifyingMembers = []
+        houseIdToCheck = household['id']
+        familyMembersToCheck = [familyMember.json() for familyMember in familyList if familyMember.householdId==houseIdToCheck]
+
+        for member in familyMembersToCheck:
+            householdIncome += member['annualIncome']
+            qualifyingMembers.append(member['id'])
+    
+        if householdIncome < householdLimit and qualifyingMembers != []:
+            eligibleHouseholds.append({"householdId": houseIdToCheck, "qualifyingMembers": qualifyingMembers})
+
+    if eligibleHouseholds == []:
+        return jsonify({
+            "code": 200,
+            "data": "There are no eligible households/qualifying members for this grant scheme"
+        })
+
+    return jsonify({
+        "code": 200,
+        "data": eligibleHouseholds
+    })
+
 #TODO: Containerize on Docker
 #TODO: Unit Tests
+
+if __name__ == '__main__':
+    #Run app on port 5000, debug mode
+    app.run(debug=True, port=5000)
