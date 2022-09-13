@@ -2,7 +2,6 @@ from codecs import getencoder
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
-from jsonmerge import merge
 from datetime import date
 
 app = Flask(__name__)
@@ -324,8 +323,6 @@ def elderbonusEligibility():
         for member in familyMembersToCheck:
             birthDate = member['dateOfBirth']
             age = today.year - birthDate.year - ((today.month, today.day) < (birthDate.month, birthDate.day))
-            print(((today.month, today.day) < (birthDate.month, birthDate.day)))
-
             if (age >= 55):
                 qualifyingMembers.append(member['id'])
                 elderCheck = True
@@ -362,7 +359,6 @@ def babySunshineEligibility():
             birthDate = member['dateOfBirth']
             if (birthDate.year == today.year):
                 monthAge = today.month - birthDate.month - ((today.day) < (birthDate.day))
-                print(monthAge)
 
                 if (monthAge < 8):
                     qualifyingMembers.append(member['id'])
