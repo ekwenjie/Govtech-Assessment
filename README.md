@@ -19,9 +19,12 @@ Modules:
 ### Setup Instructions:
 1. Start and have WAMP running
 2. Navigate to localhost -> phpmyadmin (comes together with WAMP)
-3. Run the govtechGrantAPI.sql file either through importing or copy and pasting the SQL code into the SQL input
-4. Navigate to the app.py file on terminal and run using the command: python -m run flask
-5. The app will start on port 5000. Testing can then be done on Postman.
+3. Change the Database URI as required for your personal laptop in LINE 8 of app.py. Provided in the file is the config for username root with no password, for a database to be named govgrantapi using the default port 3306.
+>   app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root@localhost:3306/govgrantapi'
+4. Run the govtechGrantAPI.sql file either through importing or copy and pasting the SQL code into the SQL input
+5. Navigate to the app.py file on terminal and run using the command:
+> python -m run flask
+7. The app will start on port 5000. Testing can then be done on Postman.
 
 ### Assumptions:
 - A household can contain 0 people, but will not be considered for grant schemes.
