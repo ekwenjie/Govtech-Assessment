@@ -123,7 +123,31 @@ def add_member():
         return jsonify({"code": 201, "id": toAdd.id, "householdId": toAdd.householdId, "name": toAdd.name, "gender": toAdd.gender, "maritalStatus": toAdd.maritalStatus, "spouse": toAdd.spouse, "occupationType": toAdd.occupationType, "annualIncome": toAdd.annualIncome, "dateOfBirth": toAdd.dateOfBirth}), 201
     return {"code": 400, "message": "Request must be a JSON"}, 400
 
-#TODO: EP3 List all households 
+#TODO: EP3 List all households and family data
+@app.route("/householdFamily")
+def get_householdFamily():
+    familyList = FamilyMember.query.all()
+    householdList = Household.query.all()
+    householdFamily = []
+
+    #IF households exist in Household DB, return list of households
+    if len(familyList) and len(householdList):
+        return jsonify(
+            {
+                "code": 200,
+                "data": {
+                    "households":[household.json() for household in householdList],
+                    "familyMembers": [familyMember.json() for familyMember in familyList]
+                }
+            }
+        )
+    #Else return 404 error, no households found
+    return jsonify(
+        {
+            "code": 404,
+            "message": "There are no family members"
+        }
+    ), 404
 
 #TODO: EP3 - List households only
 #TODO: EP3 - List family data only
