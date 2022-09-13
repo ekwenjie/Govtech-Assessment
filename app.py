@@ -50,3 +50,41 @@ class FamilyMember(db.Model):
     
     def json(self):
         return {"id": self.id, "householdId": self.householdId, "name": self.name, "gender": self.gender, "maritalStatus": self.maritalStatus, "spouse":self.spouse, "occupationType": self.occupationType, "annualIncome": self.annualIncome, "dateOfBirth": self.dateOfBirth}
+
+#TODO:EP1 Create household
+@app.route("/create/household", methods=["GET", "POST"])
+def create_household():
+    if request.is_json:
+        id=request.json['id']
+        housingType = request.json['housingType']
+
+        #If household-to-create exists, return error
+        if (Household.query.filter_by(id=id).first()):
+            return jsonify(
+                {
+                    "code":400,
+                    "data": {
+                        "id": id
+                    },
+                    "message": "Household already exists"
+                }
+            ), 400
+            
+        toAdd = Household(id, housingType)
+
+        try:
+            db.session.add(toAdd)
+            db.session.commit()
+        except:
+            return jsonify(
+                {
+                    "code": 500,
+                    "data": {
+                        "id": id
+                    },
+                    "message": "An error occurred creating the household"
+                    }
+            ), 500
+        return jsonify({"code": 201, "id": toAdd.id, "housingType": toAdd.housingType}), 201
+    return{"code": 400, "message": "Request must be a JSON"}, 400
+
