@@ -26,13 +26,19 @@ CREATE TABLE IF NOT EXISTS `familymember`(
 INSERT INTO `household` (`id`, `housingType`) VALUES
 (1, "Condominium"),
 (2, "Bungalow"),
-(3, "HDB");
-(4, "Mansion")
+(3, "HDB"),
+(4, "Mansion"),
+(5, "Condominium"),
+(6, "Executive");
 
 INSERT INTO `familymember` (`id`, `householdId`, `name`, `gender`, `maritalStatus`, `spouse`, `occupationType`, `annualIncome`, `dateOfBirth`) VALUES
-(1, 1, "Alex", "M", "Single", NULL, "Student", 0, "1990-01-01"),
+(1, 1, "Yolo Alex", "M", "Single", NULL, "Student", 0, "1990-01-01"),
 (2, 2, "Bob", "M", "Married", 3, "Employed", 1000, "1991-01-01"),
 (3, 2, "Cynthia", "F", "Married", 2, "Employed", 2000, "1992-01-01"),
-(4, 3, "Dora", "F", "Single", NULL, "Unemployed", 0, "1993-01-01");
-(5, 4, "StudentBonus", "M", "Single", NULL, "Student", 0, "2010-01-01")
+(4, 4, "StudentBonus", "M", "Single", NULL, "Student", 0, "2010-01-01"),
+(5, 3, "Multigeneration", "F", "Single", NULL, "Unemployed", 0, "2007-01-01"),
+(6, 2, "Rich Elder", "M", "Single", NULL, "Employed", 200000, "1950-01-01"),
+(7, 5, "Boss Baby", "F", "Single", NULL, "Unemployed", 0, "2022-09-09"),
+(8, 6, "Old Baby", "M", "Single", NULL, "Unemployed", 0, "2022-01-01");
+
 

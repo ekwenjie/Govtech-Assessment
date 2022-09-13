@@ -198,7 +198,7 @@ def get_familymembers():
         }
     ), 404
 
-#TODO: EP4 - Specific Household in the DB
+#TODO: EP4 - Specific Household in the DB based on ID
 @app.route("/getSpecificHousehold")
 def get_specificHousehold():
     if request.is_json:
