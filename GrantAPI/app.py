@@ -128,7 +128,6 @@ def add_member():
 def get_householdFamily():
     familyList = FamilyMember.query.all()
     householdList = Household.query.all()
-    householdFamily = []
 
     #IF households exist in Household DB, return list of households
     if len(familyList) and len(householdList):
