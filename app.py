@@ -3,6 +3,7 @@ from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from jsonmerge import merge
+from datetime import date
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root@localhost:3306/govgrantapi'
@@ -198,7 +199,74 @@ def get_familymembers():
     ), 404
 
 #TODO: EP4 - Specific Household in the DB
+@app.route("/getSpecificHousehold")
+def get_specificHousehold():
+    if request.is_json:
+        id=request.json['id']
+        familyList = FamilyMember.query.all()
+        household = Household.query.filter_by(id=id).first()
+        if household:
+            return jsonify(
+                {
+                    "code":200,
+                    "household": household.json(),
+                    "familyMembers": [familyMember.json() for familyMember in familyList if familyMember.householdId==household.id]
+                    }
+            )
+        return jsonify({
+            "code": 404,
+            "message": "The household does not exist"
+        })
+    return jsonify(
+        {
+            "code": 400,
+            "message": "Request should be a JSON"
+        }
+    )
+
 #TODO: EP5 - Grant Checks - Student Encouragement Bonus
+#Check all, return those that have a student that is eligible
+@app.route("/studentEncouragementBonus")
+def studentBonusEligibility():
+    familyList = FamilyMember.query.all()
+    householdsJson = get_households().get_json()
+    eligibleHouseholds = []
+    householdLimit = 200000
+    today = date.today()
+
+    for household in householdsJson['data']['households']: 
+        householdIncome = 0
+        studentEligibilityCheck = False
+        qualifyingMembers = []
+        houseIdToCheck = household['id']
+        familyMembersToCheck = [familyMember.json() for familyMember in familyList if familyMember.householdId==houseIdToCheck]
+        # print(familyMembersToCheck)
+
+        #Checking student eligibility and household income
+        for member in familyMembersToCheck:
+            householdIncome += member['annualIncome']
+            if (studentEligibilityCheck == False):
+                if member['occupationType'].upper().strip() == "STUDENT":
+                    birthDate = member['dateOfBirth']
+                    age = today.year - birthDate.year - ((today.month, today.day) < (birthDate.month, birthDate.day))
+                    if age < 16:
+                        studentEligibilityCheck = True
+                        qualifyingMembers.append(member['id'])
+
+        if (householdIncome < householdLimit) and studentEligibilityCheck:
+            eligibleHouseholds.append({"householdId": houseIdToCheck, "qualifyingMemberId": qualifyingMembers})
+
+    if eligibleHouseholds == []:
+        return jsonify({
+            "code": 200,
+            "data": "There are no eligible households/qualifying members for this grant scheme"
+        })
+
+    return jsonify({
+        "code": 200,
+        "data": eligibleHouseholds
+        })
+
 #TODO: EP 5 - Grant Checks - Multigenerational 
 #TODO: EP 5 - Grant Checks - Elder Bonus
 #TODO: EP 5 - Grant Checks - Baby Sunshine
