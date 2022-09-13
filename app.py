@@ -88,3 +88,50 @@ def create_household():
         return jsonify({"code": 201, "id": toAdd.id, "housingType": toAdd.housingType}), 201
     return{"code": 400, "message": "Request must be a JSON"}, 400
 
+#TODO: EP2 Add a family member to household
+@app.route("/create/member", methods=['GET', 'POST'])
+def add_member():
+    if request.is_json:
+        id=request.json['id']
+                #If household-to-create exists, return error
+        if (FamilyMember.query.filter_by(id=id).first()):
+            return jsonify(
+                {
+                    "code":400,
+                    "data": {
+                        "id": id
+                    },
+                    "message": "Member already exists"
+                }
+            ), 400
+
+        toAdd = FamilyMember(id, householdId=request.json['householdId'], name=request.json['name'], gender=request.json['gender'], maritalStatus=request.json['maritalStatus'], spouse=request.json['spouse'], occupationType=request.json['occupationType'], annualIncome=request.json['annualIncome'], dateOfBirth=request.json['dateOfBirth'])
+        
+        try:
+            db.session.add(toAdd)
+            db.session.commit()
+        except:
+            return jsonify(
+                {
+                    "code": 500,
+                    "data": {
+                        "id": id
+                    },
+                    "message": "An error occurred adding family member"
+                }
+            ), 500
+        return jsonify({"code": 201, "id": toAdd.id, "householdId": toAdd.householdId, "name": toAdd.name, "gender": toAdd.gender, "maritalStatus": toAdd.maritalStatus, "spouse": toAdd.spouse, "occupationType": toAdd.occupationType, "annualIncome": toAdd.annualIncome, "dateOfBirth": toAdd.dateOfBirth}), 201
+    return {"code": 400, "message": "Request must be a JSON"}, 400
+
+#TODO: EP3 List all households 
+
+#TODO: EP3 - List households only
+#TODO: EP3 - List family data only
+#TODO: EP4 - Specific Household in the DB
+#TODO: EP5 - Grant Checks - Student Encouragement Bonus
+#TODO: EP 5 - Grant Checks - Multigenerational 
+#TODO: EP 5 - Grant Checks - Elder Bonus
+#TODO: EP 5 - Grant Checks - Baby Sunshine
+#TODO: EP 5 - Grant Checks - YOLO GST Grant
+#TODO: Containerize on Docker
+#TODO: Unit Tests
